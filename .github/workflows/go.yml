@@ -1,5 +1,5 @@
 ---
-name: Go
+name: Go Build
 
 on:
   push:
@@ -17,29 +17,24 @@ jobs:
           go-version: ^1.15
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
-      - name: Build
-        run: go build -v ./...
-
-  test:
-    name: Validation
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Setup python environment
-        uses: actions/setup-python@v2
-      - name: Setup Go environment
-        uses: actions/setup-go@v2
-        with:
-          go-version: ^1.15
-      - name: Install Go tools
+      - name: Install dependencies
         run: |
           go get -u golang.org/x/lint/golint
-          go get github.com/fzipp/gocyclo/cmd/gocyclo
-          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.33.0
-          GO111MODULE=on go get -v -u github.com/go-critic/go-critic/cmd/gocritic
-
-      - name: Run pre-commit
-        uses: pre-commit/action@v2.0.0
+      - name: go vet
+        run: go vet .
+      - name: golint
+        run: golint .
+      - name: gofmt
+        run: gofmt -l .
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.29
+      - name: go-critic
+        run: |
+          GO111MODULE=on go get -u github.com/go-critic/go-critic/cmd/gocritic
+          gocritic check ./...
+      - name: Build
+        run: go build -v ./...
       - name: Test
         run: go test -v ./...
