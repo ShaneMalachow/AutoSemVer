@@ -3,7 +3,6 @@ name: Go
 
 on:
   push:
-    branches: [main]
   pull_request:
     branches: [main]
 
@@ -22,14 +21,25 @@ jobs:
         run: go build -v ./...
 
   test:
-    name: Test
+    name: Validation
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go 1.x
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup python environment
+        uses: actions/setup-python@v2
+      - name: Setup Go environment
         uses: actions/setup-go@v2
         with:
           go-version: ^1.15
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v2
+      - name: Install Go tools
+        run: |
+          go get -u golang.org/x/lint/golint
+          go get github.com/fzipp/gocyclo/cmd/gocyclo
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.33.0
+          GO111MODULE=on go get -v -u github.com/go-critic/go-critic/cmd/gocritic
+
+      - name: Run pre-commit
+        uses: pre-commit/action@v2.0.0
       - name: Test
         run: go test -v ./...
