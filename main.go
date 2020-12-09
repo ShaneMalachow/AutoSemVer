@@ -30,68 +30,66 @@ func main() {
 		panic(err)
 	}
 
-	versions := []semver.SemVer{}
+	version := semver.SemVer{}
+	found := false
 	commitMsgs := []string{}
 
 	// fmt.Println("Trying to find tags in order")
-	if commits.ForEach(func(c *object.Commit) error {
+	err = commits.ForEach(func(c *object.Commit) error {
 		// fmt.Println("Commit: " + c.Hash.String())
-		commitMsgs = append(commitMsgs, c.Message)
-		tagsIter, err := repo.Tags()
-		if err != nil {
-			panic(err)
-		}
-		err = tagsIter.ForEach(func(t *plumbing.Reference) error {
-			// fmt.Println(t)
-			tag, err := repo.TagObject(t.Hash())
+		if !found {
+			commitMsgs = append(commitMsgs, c.Message)
+			tagsIter, err := repo.Tags()
 			if err != nil {
-				return err
+				panic(err)
 			}
-			tagCommit, err := tag.Commit()
-			if err != nil {
-				return err
-			}
-			if tagCommit.Hash.String() == c.Hash.String() {
-				ver, err := semver.ParseSemver(strings.Split(t.Name().String(), "/")[2])
-				if err != nil {
-					return err
+			err = tagsIter.ForEach(func(t *plumbing.Reference) error {
+				// fmt.Println(t)
+				// tag, err := repo.TagObject(t.Hash())
+				// if err != nil {
+				// 	panic(err)
+				// }
+				// tagCommit, err := tag.Commit()
+				// if err != nil {
+				// 	panic(err)
+				// }
+				if t.Hash().String() == c.Hash.String() {
+					version, err = semver.ParseSemver(strings.Split(t.Name().String(), "/")[2])
+					if err != nil {
+						panic(err)
+					}
+					found = true
+					return nil
 				}
-				versions = append(versions, ver)
 				return nil
-			}
-			return nil
-		})
-		return err
-	}) != nil {
+			})
+			return err
+		}
+		return nil
+	})
+	if err != nil {
 		panic(err)
 	}
 
 	highestChange := "noop"
+	// fmt.Printf("Major:%v\nMinor:%v\nPatch:%v\n", major, minor, patch)
 	for _, s := range commitMsgs {
 		groups := r.FindStringSubmatch(s)
-		if groups[2] != "" {
-			for _, maj := range major {
-				if groups[2] == maj {
-					highestChange = "major"
-				}
+		commitType := groups[2]
+		if commitType != "" {
+			switch {
+			case checkSlice(major, commitType):
+				highestChange = "major"
+			case checkSlice(minor, commitType) && highestChange != "major":
+				highestChange = "minor"
+			case checkSlice(patch, commitType) && highestChange != "major" && highestChange != "minor":
+				highestChange = "patch"
 			}
-			if highestChange != "major" {
-				for _, min := range minor {
-					if groups[2] == min {
-						highestChange = "minor"
-					}
-				}
-			} else if highestChange != "minor" {
-				for _, pat := range patch {
-					if groups[2] == pat {
-						highestChange = "patch"
-					}
-				}
-			}
-
 		}
 	}
-	nextVer := versions[0]
+	// fmt.Println(version.Version())
+	// fmt.Println(highestChange)
+	nextVer := version
 	// fmt.Println(nextVer.Version())
 	switch highestChange {
 	case "major":
@@ -105,4 +103,13 @@ func main() {
 		nextVer.Patch++
 	}
 	fmt.Print(nextVer.Version())
+}
+
+func checkSlice(words []string, s string) bool {
+	for _, word := range words {
+		if s == word {
+			return true
+		}
+	}
+	return false
 }
