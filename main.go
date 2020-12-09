@@ -38,6 +38,9 @@ func main() {
 		// fmt.Println("Commit: " + c.Hash.String())
 		commitMsgs = append(commitMsgs, c.Message)
 		tagsIter, err := repo.Tags()
+		if err != nil {
+			panic(err)
+		}
 		err = tagsIter.ForEach(func(t *plumbing.Reference) error {
 			// fmt.Println(t)
 			tag, err := repo.TagObject(t.Hash())
@@ -78,15 +81,14 @@ func main() {
 						highestChange = "minor"
 					}
 				}
-			} else {
-				if highestChange != "minor" {
-					for _, pat := range patch {
-						if groups[2] == pat {
-							highestChange = "patch"
-						}
+			} else if highestChange != "minor" {
+				for _, pat := range patch {
+					if groups[2] == pat {
+						highestChange = "patch"
 					}
 				}
 			}
+
 		}
 	}
 	nextVer := versions[0]

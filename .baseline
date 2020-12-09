@@ -1,0 +1,50 @@
+{
+  "exclude": {
+    "files": null,
+    "lines": null
+  },
+  "generated_at": "2020-12-09T03:18:06Z",
+  "plugins_used": [
+    {
+      "name": "AWSKeyDetector"
+    },
+    {
+      "name": "ArtifactoryDetector"
+    },
+    {
+      "name": "BasicAuthDetector"
+    },
+    {
+      "hex_limit": 3,
+      "name": "HexHighEntropyString"
+    },
+    {
+      "name": "JwtTokenDetector"
+    },
+    {
+      "keyword_exclude": null,
+      "name": "KeywordDetector"
+    },
+    {
+      "name": "MailchimpDetector"
+    },
+    {
+      "name": "PrivateKeyDetector"
+    },
+    {
+      "name": "SlackDetector"
+    },
+    {
+      "name": "SoftlayerDetector"
+    },
+    {
+      "name": "StripeDetector"
+    }
+  ],
+  "results": {},
+  "version": "0.13.0",
+  "word_list": {
+    "file": null,
+    "hash": null
+  }
+}
