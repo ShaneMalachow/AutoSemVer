@@ -1,0 +1,19 @@
+on:
+  release:
+    types: [created]
+name: Process release
+jobs:
+  generate:
+    name: Create release artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+      - name: Build binaries
+        run: go build -o semver-${{github.event.release.tag_name}} -v ./...
+      - name: Upload binary to release
+        uses: skx/github-action-publish-binaries@master
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          args: 'semver'
