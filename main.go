@@ -102,5 +102,5 @@ func main() {
 	case "patch":
 		nextVer.Patch++
 	}
-	fmt.Println(nextVer.Version())
+	fmt.Print(nextVer.Version())
 }
