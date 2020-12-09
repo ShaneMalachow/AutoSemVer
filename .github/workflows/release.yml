@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build
-      run: VERSION=${{github.ref}} make build
+      run: make build
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
