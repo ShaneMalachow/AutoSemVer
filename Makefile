@@ -1,3 +1,5 @@
+NEXT_TAG := $(shell go run main.go)
+
 build:
 	mkdir build/
 	env GOOS=windows GOARCH=amd64 go build -o build/semver-windows-amd64-$(VERSION).exe main.go
@@ -8,4 +10,4 @@ clean:
 	rm -rf build/
 
 release-tag:
-	git tag v$(go run main.go) -m "Release version $(go run main.go)"
+	git tag v$(NEXT_TAG) -m "Release version $(NEXT_TAG)"
