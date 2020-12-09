@@ -1,5 +1,4 @@
 NEXT_TAG := $(shell go run main.go)
-VERSION := $(shell git describe)
 
 build:
 	mkdir build/
