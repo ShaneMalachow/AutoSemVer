@@ -1,20 +1,21 @@
----
 on:
-  release:
-    types: [created]
-name: Process release
+  push:
+    tags:
+      - '*'
+
 jobs:
-  generate:
-    name: Create release artifacts
+  publish:
+    name: Publish binaries
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@master
-      - name: Build binaries
-        run: go build -o semver-${{github.event.release.tag_name}} -v ./...
-      - name: Upload binary to release
-        uses: skx/github-action-publish-binaries@master
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-        with:
-          args: 'semver'
+    - uses: actions/checkout@v2
+    - name: Build
+      run: GOOS=${{matrix.os}}
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: target/release/${{ matrix.artifact_name }}
+        asset_name: ${{ matrix.asset_name }}
+        tag: ${{ github.ref }}
