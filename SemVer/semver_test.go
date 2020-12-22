@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	semver "github.com/shanemalachow/AutoSemVer/SemVer"
+	"github.com/ShaneMalachow/AutoSemVer/semver"
 )
 
 type SemVerDataset struct {
