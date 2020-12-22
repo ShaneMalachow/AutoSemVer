@@ -3,8 +3,6 @@ name: Go Build
 
 on:
   push:
-  pull_request:
-    branches: [main]
 
 jobs:
   build:
@@ -20,7 +18,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
-          version: v1.29
+          version: v1.33
       - name: go-critic
         run: |
           GO111MODULE=on go get -u github.com/go-critic/go-critic/cmd/gocritic
